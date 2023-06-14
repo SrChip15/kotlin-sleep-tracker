@@ -51,6 +51,10 @@ class SleepTrackerViewModel(
         _navigateToSleepQuality.value = null
     }
 
+    val startButtonVisible = tonight.map { null == it }
+    val stopButtonVisible = tonight.map { null != it }
+    val clearButtonVisible = nights.map { it.isNotEmpty() }
+
     init {
         initializeTonight()
     }
