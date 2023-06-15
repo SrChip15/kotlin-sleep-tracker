@@ -1,10 +1,11 @@
 package com.example.android.trackmysleepquality.sleeptracker
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.trackmysleepquality.R
 import com.example.android.trackmysleepquality.convertDurationToFormatted
@@ -12,16 +13,9 @@ import com.example.android.trackmysleepquality.convertNumericQualityToString
 import com.example.android.trackmysleepquality.database.SleepNight
 import com.example.android.trackmysleepquality.databinding.ListItemSleepNightBinding
 
-class SleepNightAdapter : RecyclerView.Adapter<SleepNightVH>() {
+class SleepNightAdapter : ListAdapter<SleepNight, SleepNightVH>(SleepNightDiffCallback()) {
 
     private lateinit var binding: ListItemSleepNightBinding
-
-    var data = listOf<SleepNight>()
-        @SuppressLint("NotifyDataSetChanged")
-        set(value) {
-            field = value
-            notifyDataSetChanged()
-        }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SleepNightVH {
         binding = DataBindingUtil.inflate(
@@ -35,7 +29,7 @@ class SleepNightAdapter : RecyclerView.Adapter<SleepNightVH>() {
     }
 
     override fun onBindViewHolder(holder: SleepNightVH, position: Int) {
-        val currentNight = data[position]
+        val currentNight = getItem(position)
         val res = holder.itemView.context.resources
 
         binding.qualityImage.setImageResource(
@@ -53,11 +47,17 @@ class SleepNightAdapter : RecyclerView.Adapter<SleepNightVH>() {
             convertDurationToFormatted(currentNight.startTimeMilli, currentNight.stopTimeMilli, res)
         binding.qualityString.text = convertNumericQualityToString(currentNight.sleepQuality, res)
     }
-
-    override fun getItemCount(): Int {
-        return data.size
-    }
-
 }
 
 class SleepNightVH(itemView: View) : RecyclerView.ViewHolder(itemView)
+
+class SleepNightDiffCallback: DiffUtil.ItemCallback<SleepNight>() {
+    override fun areItemsTheSame(oldItem: SleepNight, newItem: SleepNight): Boolean {
+        return oldItem.nightId == newItem.nightId
+    }
+
+    override fun areContentsTheSame(oldItem: SleepNight, newItem: SleepNight): Boolean {
+        return oldItem == newItem
+    }
+
+}
