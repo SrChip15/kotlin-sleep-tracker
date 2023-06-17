@@ -17,15 +17,16 @@ class SleepNightAdapter(private val clickListener: SleepNightListener) :
 
     override fun onBindViewHolder(holder: SleepNightVH, position: Int) {
         val currentNight = getItem(position)
-        holder.bind(currentNight)
+        holder.bind(clickListener, currentNight)
     }
 }
 
 class SleepNightVH private constructor
     (private val binding: ListItemSleepNightBinding) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(item: SleepNight) {
+    fun bind(clickListener: SleepNightListener, item: SleepNight) {
         binding.sleep = item
+        binding.clickListener = clickListener
         binding.executePendingBindings()
     }
 
