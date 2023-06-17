@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -60,7 +61,10 @@ class SleepTrackerFragment : Fragment() {
             ViewModelProvider(this, sleepViewModelFactory)[SleepTrackerViewModel::class.java]
 
         val manager = GridLayoutManager(activity, 3)
-        val adapter = SleepNightAdapter()
+        val adapter = SleepNightAdapter(SleepNightListener { nightId ->
+            viewModel.onSleepNightClicked(nightId)
+        })
+
         binding.sleepList.layoutManager = manager
         binding.sleepList.adapter = adapter
         binding.sleepList.setHasFixedSize(true)
@@ -69,11 +73,21 @@ class SleepTrackerFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
 
         viewModel.apply {
-            nights.observe(this@SleepTrackerFragment.viewLifecycleOwner) {
+            val fragment = this@SleepTrackerFragment
+            var clickedTimes = 0
+
+            navigateToSleepDataQuality.observe(fragment.viewLifecycleOwner) { night ->
+                night?.let {
+                    Toast.makeText(context, "Clicked: ${++clickedTimes} times", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+
+            nights.observe(fragment.viewLifecycleOwner) {
                 it?.let { adapter.submitList(it) }
             }
 
-            navigateToSleepQuality.observe(this@SleepTrackerFragment.viewLifecycleOwner) { night ->
+            navigateToSleepQuality.observe(fragment.viewLifecycleOwner) { night ->
                 night?.let {
                     this@SleepTrackerFragment.findNavController().navigate(
                         SleepTrackerFragmentDirections
@@ -83,7 +97,7 @@ class SleepTrackerFragment : Fragment() {
                 }
             }
 
-            showSnackBarEvent.observe(this@SleepTrackerFragment.viewLifecycleOwner) {
+            showSnackBarEvent.observe(fragment.viewLifecycleOwner) {
                 if (it == true) {
                     Snackbar.make(
                         requireActivity().findViewById(android.R.id.content),
