@@ -84,7 +84,7 @@ class SleepTrackerFragment : Fragment() {
             }
 
             nights.observe(fragment.viewLifecycleOwner) {
-                it?.let { adapter.submitList(it) }
+                it?.let { adapter.addHeaderAndSubmitList(it) }
             }
 
             navigateToSleepQuality.observe(fragment.viewLifecycleOwner) { night ->
