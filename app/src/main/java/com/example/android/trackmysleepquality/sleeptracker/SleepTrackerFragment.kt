@@ -60,6 +60,14 @@ class SleepTrackerFragment : Fragment() {
             ViewModelProvider(this, sleepViewModelFactory)[SleepTrackerViewModel::class.java]
 
         val manager = GridLayoutManager(activity, 3)
+        manager.spanSizeLookup = object: GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return when (position) {
+                    0 -> 3
+                    else -> 1
+                }
+            }
+        }
         val adapter = SleepNightAdapter(SleepNightListener { nightId ->
             viewModel.onSleepNightClicked(nightId)
         })
